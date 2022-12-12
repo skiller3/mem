@@ -1,11 +1,15 @@
 from blessed import Terminal
 from threading import Thread
+from utils import out, autocomplete
 import subprocess
 import msvcrt
 import shlex
 import time
+import dao
 import sys
 import io
+import os
+import re
 
 
 def _draw(term, mem_output_buffer, user_input_buffer):
@@ -58,6 +62,33 @@ def memi():
             while not msvcrt.kbhit():
                 time.sleep(0.01)
             ch = msvcrt.getwche()
+            out(str(ord(ch)))
+            if ch == "\t":
+                out("tab")
+                memstate = dao.load_memstate()
+                command = user_input_buffer.getvalue()
+                command_frags = re.split(r'\s+', command)
+                out(str(command_frags))
+                if len(command_frags) < 2:
+                    _draw(term, mem_output_buffer, user_input_buffer)
+                    continue
+                prefix = command_frags[-1]
+                if not prefix:
+                    _draw(term, mem_output_buffer, user_input_buffer)
+                    continue
+
+                targets = [t for t in memstate["focus_targets"].keys()]
+
+                completion = autocomplete(prefix, targets)
+                out(f"prefix: {prefix}, words: {targets}, completion: {completion}")
+
+                user_input_buffer.truncate(0)
+                user_input_buffer.seek(0)
+
+                command = command[:(-1 * len(prefix))] + completion
+                user_input_buffer.write(command)
+                _draw(term, mem_output_buffer, user_input_buffer)
+                continue
             if ch == "\b":
                 command = user_input_buffer.getvalue()
                 command = str(command[:-1])

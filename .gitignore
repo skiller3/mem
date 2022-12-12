@@ -131,3 +131,4 @@ dmypy.json
 # mem materials
 memstate
 memfiles
+out

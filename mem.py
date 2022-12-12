@@ -6,6 +6,7 @@ if len(sys.argv) < 2:
 
 from datetime import datetime
 import click
+import utils
 import json
 import os
 
@@ -15,6 +16,8 @@ class AliasedGroup(click.Group):
     SUBCOMMAND_SHORTCUTS = {
         'a': 'add-focus-target',
         'add': 'add-focus-target',
+        'd': 'delay-focus-target',
+        'delay': 'delay-focus-target',
         'k': 'kill-focus-target',
         'kill': 'kill-focus-target',
         'e': 'edit-focus-target-description',
@@ -63,7 +66,6 @@ def _init_memfiles_if_not_exist():
     if not os.path.exists(fname):
         os.mkdir(fname)  
 
-
 def _load_memstate():
     fname = os.path.join(os.path.dirname(__file__), "memstate")
 
@@ -110,6 +112,25 @@ def add_focus_target(*args, **kwargs):
     with open(fname_description, "wt") as filehandle:
         filehandle.write(description)
         filehandle.flush()
+
+@mem.command()
+@click.argument("name", nargs=1, type=click.STRING)
+@click.argument("delay", nargs=1, type=click.STRING)
+def delay_focus_target(*args, **kwargs):
+    memstate = _load_memstate()
+
+    name = kwargs["name"]
+    delay = kwargs["delay"]
+    focus_targets = memstate["focus_targets"]
+
+    if name not in focus_targets:
+        raise click.ClickException(f'Focus target "{name}" doesn\'t exists!  Operation aborted.')
+
+    delay_target = utils.parse_delay(delay).isoformat()  # UTC
+
+    focus_targets[name]["delayed_to"] = delay_target
+
+    _save_memstate(memstate)
 
 @mem.command()
 @click.argument("name", nargs=1, type=click.STRING)
@@ -167,7 +188,23 @@ def list_important_focus_targets(*args, **kwargs):
     focus_span = memstate["focus_span"]
     targets = memstate["focus_targets"]
     targets = list(targets.items())
-    targets.sort(key=lambda target: int(target[1]["importance"]), reverse=True)
+
+    now = datetime.utcnow()
+    def is_delayed(target):
+        delayed_to = target[1].get("delayed_to")  # UTC
+        if not delayed_to:
+            return False
+        return now <= datetime.fromisoformat(delayed_to)
+
+    targets.sort(key=lambda target: target[1]["importance"], reverse=True)
+    curr_targets, delay_targets = [], []
+    for target in targets:
+        if not is_delayed(target):
+            curr_targets.append(target)
+        else:
+            delay_targets.append(target)
+    targets = curr_targets + delay_targets
+
     for idx, target in enumerate(targets):
         if idx >= focus_span:
             break
@@ -176,19 +213,39 @@ def list_important_focus_targets(*args, **kwargs):
         snippet = _get_description_snippet(name)
         if not snippet:
             snippet = "(empty)"
+        if is_delayed(target):
+            name = "[delayed] " + name
         print(importance, ":", name, "-", snippet)
 
 @mem.command()
 def list_all_focus_targets(*args, **kwargs):
     targets = _load_memstate()["focus_targets"]
     targets = list(targets.items())
+
+    now = datetime.utcnow()
+    def is_delayed(target):
+        delayed_to = target[1].get("delayed_to")  # UTC
+        if not delayed_to:
+            return False
+        return now <= datetime.fromisoformat(delayed_to)
+
     targets.sort(key=lambda target: int(target[1]["importance"]), reverse=True)
+    curr_targets, delay_targets = [], []
+    for target in targets:
+        if not is_delayed(target):
+            curr_targets.append(target)
+        else:
+            delay_targets.append(target)
+    targets = curr_targets + delay_targets
+
     for target in targets:
         importance = target[1]["importance"]
         name = target[0]
         snippet = _get_description_snippet(name)
         if not snippet:
             snippet = "(empty)"
+        if is_delayed(target):
+            name = "[delayed] " + name
         print(importance, ":", name, "-", snippet)
 
 @mem.command()
