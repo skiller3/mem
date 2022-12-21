@@ -131,7 +131,7 @@ dmypy.json
 .pyre/
 
 # VS Code IDE settings
-.vscode
+**/.vscode
 
 # mem materials
 memstate
