@@ -3,14 +3,24 @@ from threading import Thread
 from utils import out, autocomplete
 from unicodedata import category
 import subprocess
-import msvcrt
 import shlex
 import time
 import dao
 import sys
 import io
+import os
 import re
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MEM_CMD_EXT = 'bat' if sys.platform.startswith('win32') else 'sh'
+MEM_CMD = os.path.join(BASE_DIR, f"mem.{MEM_CMD_EXT}")
+
+
+def _portable_getch(term):
+    if sys.platform.startswith("win32"):
+        import msvcrt
+        return msvcrt.getwch()
+    return term.getch()
 
 def _draw(term, mem_output_buffer, user_input_buffer):
     term.location(0, 0)
@@ -26,7 +36,7 @@ def _display_message(term, content):
     print(term.clear)
     print(content)
     print("\n--------- PRESS ANY KEY TO CONTINUE ----------")
-    msvcrt.getwche()
+    _portable_getch(term)
 
 def memi():
     term = Terminal()
@@ -35,12 +45,12 @@ def memi():
     user_input_buffer = io.StringIO()
 
     def stream_mem_content():
-        process = subprocess.run(['mem.bat', 'l'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        process = subprocess.run([MEM_CMD, 'l'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
         output = process.stdout.decode("utf-8")
         mem_output_buffer.write(output)
         _draw(term, mem_output_buffer, user_input_buffer)
         while mem_streaming_on:
-            process = subprocess.run(['mem.bat', 'l'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+            process = subprocess.run([MEM_CMD, 'l'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
             new_output = process.stdout.decode("utf-8")
             if output != new_output:
                 output = new_output
@@ -57,12 +67,13 @@ def memi():
     with term.fullscreen(), term.cbreak():
         _draw(term, mem_output_buffer, user_input_buffer)
         while True:
-            while not msvcrt.kbhit():
+            if not term.kbhit(timeout=0):
                 time.sleep(0.01)
-            ch = msvcrt.getwche()
-            out(ch)
-            out(str(ord(ch)))
-            out(category(ch))
+                continue
+            ch = _portable_getch(term)
+            out(f"ch: {ch}")
+            out(f"ord: {str(ord(ch))}")
+            out(f"category: {category(ch)}")
             if ch == "\t":
                 memstate = dao.load_memstate()
                 command = user_input_buffer.getvalue()
@@ -95,7 +106,7 @@ def memi():
                 user_input_buffer.write(command)
                 _draw(term, mem_output_buffer, user_input_buffer)
                 continue
-            if ch == "\r":
+            if ch in ["\r", "\n"]:
                 command = user_input_buffer.getvalue()
                 user_input_buffer.truncate(0)
                 user_input_buffer.seek(0)
@@ -107,7 +118,7 @@ def memi():
                     mem_thread.join()
                     break
                 try:
-                    command = ["mem.bat"] + shlex.split(command)
+                    command = [MEM_CMD] + shlex.split(command)
                 except:
                     _display_message(term, f'Unable to parse command: {command}')
                     _draw(term, mem_output_buffer, user_input_buffer)
@@ -130,9 +141,10 @@ def memi():
                 _draw(term, mem_output_buffer, user_input_buffer)
                 continue
             if category(ch)[0] == "C":
+                out("Control Character")
                 # Discard control character and immediate following characters
-                while msvcrt.kbhit():
-                    msvcrt.getwche()
+                while term.kbhit(timeout=0):
+                    _portable_getch(term)
                 _draw(term, mem_output_buffer, user_input_buffer)
                 continue 
             user_input_buffer.write(ch)
