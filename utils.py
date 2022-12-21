@@ -91,13 +91,11 @@ def parse_delay(delaystr):
     tzinfo = tzinfo if tzinfo else get_localzone()
     return convert_datetime_timezone(delaytarget, tzinfo, pytz.utc)
 
-def out(text, end="\n"):
+def out(*args, **kwargs):
     debug = '--debug' in (arg.lower() for arg in sys.argv)
-    if debug:
-        outf = os.path.join(os.path.dirname(__file__), "out")
-    else:
-        outf = os.devnull
+    if not debug:
+        return
+    outf = os.path.join(os.path.dirname(os.path.abspath(__file__)), "out")
     with open(outf, "at", encoding="utf-8") as fh:
-        fh.write(text)
-        fh.write(end)
-        fh.flush()
+        kwargs["file"] = fh
+        print(*args, **kwargs)
