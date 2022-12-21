@@ -104,6 +104,8 @@ celerybeat.pid
 # Environments
 .env
 .venv
+.venv-windows/
+.venv-ubuntu/
 env/
 venv/
 ENV/
@@ -129,7 +131,7 @@ dmypy.json
 .pyre/
 
 # VS Code IDE settings
-.vscode
+.vscode/
 
 # mem materials
 memstate

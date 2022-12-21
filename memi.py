@@ -18,10 +18,8 @@ def _draw(term, mem_output_buffer, user_input_buffer):
     print(mem_output_buffer.getvalue())
     print(term.move_y(term.height - 3))
     term.location(0, term.height - 3)
-    sys.stdout.write("mem> ")
-    sys.stdout.flush()
-    sys.stdout.write(user_input_buffer.getvalue())
-    sys.stdout.flush()
+    print("mem> ", end="", flush=True)
+    print(user_input_buffer.getvalue(), end="", flush=True)
 
 def _display_message(term, content):
     term.location(0, 0)
