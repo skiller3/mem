@@ -1,6 +1,6 @@
 import sys
 
-# Argument hack to always default behavior to "list-important-focus-targets"
+# Ensure default sub-command is always "list-important-focus-targets"
 if len(sys.argv) < 2:
     sys.argv.append('l')
 
@@ -16,8 +16,10 @@ class AliasedGroup(click.Group):
     SUBCOMMAND_SHORTCUTS = {
         'a': 'add-focus-target',
         'add': 'add-focus-target',
-        'd': 'delay-focus-target',
-        'delay': 'delay-focus-target',
+        'r': 'rename-focus-target',
+        'rename': 'rename-focus-target',
+        'd': 'defer-focus-target',
+        'defer': 'defer-focus-target',
         'k': 'kill-focus-target',
         'kill': 'kill-focus-target',
         'e': 'edit-focus-target-description',
@@ -58,7 +60,7 @@ def _init_memstate_if_not_exist():
         'focus_targets': {}
     }
     with open(fname, "wt") as fhandle:
-        json.dump(memstate, fhandle)
+        json.dump(memstate, fhandle, indent=2)
         fhandle.flush()
 
 def _init_memfiles_if_not_exist():
@@ -77,7 +79,7 @@ def _load_memstate():
 def _save_memstate(memstate):
     fname = os.path.join(os.path.dirname(__file__), "memstate")
     with open(fname, "wt") as fhandle:
-        memstate = json.dump(memstate, fhandle)
+        memstate = json.dump(memstate, fhandle, indent=2)
         fhandle.flush()
 
 def _get_description_snippet(name):
@@ -114,9 +116,33 @@ def add_focus_target(*args, **kwargs):
         filehandle.flush()
 
 @mem.command()
+@click.argument("old_name", nargs=1, type=click.STRING)
+@click.argument("new_name", nargs=1, type=click.STRING)
+def rename_focus_target(*args, **kwargs):
+    memstate = _load_memstate()
+    old_name = kwargs["old_name"]
+    new_name = kwargs["new_name"]
+
+    focus_targets = memstate["focus_targets"]
+
+    if old_name not in focus_targets:
+        raise click.ClickException(f'Focus target "{old_name}" doesn\'t exist!  Operation aborted.')
+    if new_name in focus_targets:
+        raise click.ClickException(f'Focus target "{new_name}" already exists!  Operation aborted.')
+
+    focus_targets[new_name] = focus_targets[old_name]
+    del focus_targets[old_name]
+
+    old_file = os.path.join(os.path.dirname(__file__), "memfiles", old_name)
+    new_file = os.path.join(os.path.dirname(__file__), "memfiles", new_name)
+    os.rename(old_file, new_file)
+
+    _save_memstate(memstate)
+
+@mem.command()
 @click.argument("name", nargs=1, type=click.STRING)
 @click.argument("delay", nargs=1, type=click.STRING)
-def delay_focus_target(*args, **kwargs):
+def defer_focus_target(*args, **kwargs):
     memstate = _load_memstate()
 
     name = kwargs["name"]
@@ -126,9 +152,9 @@ def delay_focus_target(*args, **kwargs):
     if name not in focus_targets:
         raise click.ClickException(f'Focus target "{name}" doesn\'t exists!  Operation aborted.')
 
-    delay_target = utils.parse_delay(delay).isoformat()  # UTC
+    deferred_to = utils.parse_delay(delay).isoformat()  # UTC
 
-    focus_targets[name]["delayed_to"] = delay_target
+    focus_targets[name]["deferred_to"] = deferred_to
 
     _save_memstate(memstate)
 
@@ -190,20 +216,20 @@ def list_important_focus_targets(*args, **kwargs):
     targets = list(targets.items())
 
     now = datetime.utcnow()
-    def is_delayed(target):
-        delayed_to = target[1].get("delayed_to")  # UTC
-        if not delayed_to:
+    def is_deferred(target):
+        deferred_to = target[1].get("deferred_to")  # UTC
+        if not deferred_to:
             return False
-        return now <= datetime.fromisoformat(delayed_to)
+        return now <= datetime.fromisoformat(deferred_to)
 
     targets.sort(key=lambda target: target[1]["importance"], reverse=True)
-    curr_targets, delay_targets = [], []
+    curr_targets, defer_targets = [], []
     for target in targets:
-        if not is_delayed(target):
+        if not is_deferred(target):
             curr_targets.append(target)
         else:
-            delay_targets.append(target)
-    targets = curr_targets + delay_targets
+            defer_targets.append(target)
+    targets = curr_targets + defer_targets
 
     for idx, target in enumerate(targets):
         if idx >= focus_span:
@@ -213,9 +239,14 @@ def list_important_focus_targets(*args, **kwargs):
         snippet = _get_description_snippet(name)
         if not snippet:
             snippet = "(empty)"
-        if is_delayed(target):
-            name = "[delayed] " + name
+        if is_deferred(target):
+            deferred_to = datetime.fromisoformat(target[1]["deferred_to"])
+            deferred_to = utils.convert_utc_to_local(deferred_to)
+            deferred_weekday = deferred_to.strftime("%A")[:3]
+            deferred_to = deferred_to.strftime("%m/%d")
+            name = f"[{deferred_weekday} {deferred_to}] {name}"
         print(importance, ":", name, "-", snippet)
+    print(f"\n==> {len(defer_targets)} Deferred Items; {len(targets)} Total Items")
 
 @mem.command()
 def list_all_focus_targets(*args, **kwargs):
@@ -223,20 +254,20 @@ def list_all_focus_targets(*args, **kwargs):
     targets = list(targets.items())
 
     now = datetime.utcnow()
-    def is_delayed(target):
-        delayed_to = target[1].get("delayed_to")  # UTC
-        if not delayed_to:
+    def is_deferred(target):
+        deferred_to = target[1].get("deferred_to")  # UTC
+        if not deferred_to:
             return False
-        return now <= datetime.fromisoformat(delayed_to)
+        return now <= datetime.fromisoformat(deferred_to)
 
     targets.sort(key=lambda target: int(target[1]["importance"]), reverse=True)
-    curr_targets, delay_targets = [], []
+    curr_targets, defer_targets = [], []
     for target in targets:
-        if not is_delayed(target):
+        if not is_deferred(target):
             curr_targets.append(target)
         else:
-            delay_targets.append(target)
-    targets = curr_targets + delay_targets
+            defer_targets.append(target)
+    targets = curr_targets + defer_targets
 
     for target in targets:
         importance = target[1]["importance"]
@@ -244,9 +275,14 @@ def list_all_focus_targets(*args, **kwargs):
         snippet = _get_description_snippet(name)
         if not snippet:
             snippet = "(empty)"
-        if is_delayed(target):
-            name = "[delayed] " + name
+        if is_deferred(target):
+            deferred_to = datetime.fromisoformat(target[1]["deferred_to"])
+            deferred_to = utils.convert_utc_to_local(deferred_to)
+            deferred_weekday = deferred_to.strftime("%A")[:3]
+            deferred_to = deferred_to.strftime("%m/%d")
+            name = f"[{deferred_weekday} {deferred_to}] {name}"
         print(importance, ":", name, "-", snippet)
+    print(f"\n==> {len(defer_targets)} Deferred Items; {len(targets)} Total Items")
 
 @mem.command()
 @click.argument("span", nargs=1, type=click.INT)

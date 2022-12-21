@@ -1,6 +1,7 @@
 from blessed import Terminal
 from threading import Thread
 from utils import out, autocomplete
+from unicodedata import category
 import subprocess
 import msvcrt
 import shlex
@@ -8,7 +9,6 @@ import time
 import dao
 import sys
 import io
-import os
 import re
 
 
@@ -56,19 +56,19 @@ def memi():
     mem_thread.daemon = True
     mem_thread.start()
 
-    with term.fullscreen():
+    with term.fullscreen(), term.cbreak():
         _draw(term, mem_output_buffer, user_input_buffer)
         while True:
             while not msvcrt.kbhit():
                 time.sleep(0.01)
             ch = msvcrt.getwche()
+            out(ch)
             out(str(ord(ch)))
+            out(category(ch))
             if ch == "\t":
-                out("tab")
                 memstate = dao.load_memstate()
                 command = user_input_buffer.getvalue()
                 command_frags = re.split(r'\s+', command)
-                out(str(command_frags))
                 if len(command_frags) < 2:
                     _draw(term, mem_output_buffer, user_input_buffer)
                     continue
@@ -80,7 +80,6 @@ def memi():
                 targets = [t for t in memstate["focus_targets"].keys()]
 
                 completion = autocomplete(prefix, targets)
-                out(f"prefix: {prefix}, words: {targets}, completion: {completion}")
 
                 user_input_buffer.truncate(0)
                 user_input_buffer.seek(0)
@@ -89,7 +88,8 @@ def memi():
                 user_input_buffer.write(command)
                 _draw(term, mem_output_buffer, user_input_buffer)
                 continue
-            if ch == "\b":
+            if ord(ch) == 127:
+                out("backspace")
                 command = user_input_buffer.getvalue()
                 command = str(command[:-1])
                 user_input_buffer.truncate(0)
@@ -131,6 +131,12 @@ def memi():
                         _display_message(term, output)
                 _draw(term, mem_output_buffer, user_input_buffer)
                 continue
+            if category(ch)[0] == "C":
+                # Discard control character and immediate following characters
+                while msvcrt.kbhit():
+                    msvcrt.getwche()
+                _draw(term, mem_output_buffer, user_input_buffer)
+                continue 
             user_input_buffer.write(ch)
             _draw(term, mem_output_buffer, user_input_buffer)
 
