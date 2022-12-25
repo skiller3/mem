@@ -75,7 +75,7 @@ def memi():
             out(f"ord: {str(ord(ch))}")
             out(f"category: {category(ch)}")
             if ch == "\t":
-                memstate = dao.load_memstate()
+                memstate = dao.get_memstate()
                 command = user_input_buffer.getvalue()
                 command_frags = re.split(r'\s+', command)
                 if len(command_frags) < 2:

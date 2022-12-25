@@ -134,6 +134,7 @@ dmypy.json
 **/.vscode
 
 # mem materials
-memstate
-memfiles
-out
+**/memstate.json
+**/memconfig.json
+**/memfiles
+**/out
