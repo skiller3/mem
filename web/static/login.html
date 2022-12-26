@@ -1,0 +1,52 @@
+<html>
+    <head>
+        <title>MEMI Login</title>
+        <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+        <style>
+            body {
+                background-color: black;
+                color: white;
+            }
+            h1 {
+                margin: auto;
+                margin-top: 1em;
+                width: 100%;
+                text-align: center;
+            }
+            form {
+                padding: 1em;
+                margin: auto;
+                margin-top: 1em;
+                width: 80%;
+                max-width: 25em;
+            }
+            form label {
+                display: inline-block;
+                width: 100%;
+                text-align: center;
+            }
+            .login-input {
+                display: block;
+                margin: auto;
+                text-align: center;
+                width: 25em;
+            }
+            #submit {
+                margin: auto;
+                display: block;
+                min-width: 7em;
+                min-height: 3em;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>MEMI Login</h1>
+        <form action="/login" method="post">
+            <label for="username">Username</label><br>
+            <input type="text" id="username" name="username" class="login-input"><br>
+            <label for="password">Password</label><br>
+            <input type="password" id="password" name="password" class="login-input"><br><br>
+            <input type="submit" value="Submit" id="submit">
+          </form>
+    </body>
+</html>

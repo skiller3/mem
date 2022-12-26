@@ -3,10 +3,16 @@ from dateutil.relativedelta import relativedelta, SU, MO, TU, WE, TH, FR, SA
 from tzlocal import get_localzone
 import click
 import pytz
+import json
 import sys
 import os
 import re
 
+
+def get_config():
+    fname = os.path.join(os.path.dirname(os.path.abspath(__file__)), "memconfig.json")
+    with open(fname, "rt", encoding="utf-8") as fhandle:
+        return json.load(fhandle)
 
 def autocomplete(prefix, words):
     filtered_words = [w for w in words if w.startswith(prefix)]

@@ -1,0 +1,35 @@
+<html>
+    <head>
+        <title>MEMI Terminal</title>
+        <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+        <link rel="stylesheet" href="/static/xterm.css" />
+        <script src="/static/axios.min.js"></script>
+        <script src="/static/xterm.js"></script>
+        <script src="/static/memi.js"></script>
+
+        <style>
+            body {
+                background-color: black;
+                color: white;
+            }
+            .terminal {
+                padding: 1em;
+            }
+            .xterm-viewport {
+                border: 1px solid white;
+                border-radius: 8px;
+            }
+            #input-terminal {
+                margin-top: 1em;
+                height: 1em;
+            }
+            #input-terminal > .terminal {
+                height: 1em;
+            }
+        </style>
+    </head>
+    <body>
+    <div id="output-terminal"></div>
+    <div id="input-terminal"></div>
+    </body>
+</html>
