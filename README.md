@@ -1,2 +1,2 @@
 # mem
-A focus manager for hackers with too many tasks.
+A focus manager for a hacker with too many distractions.
