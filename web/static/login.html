@@ -6,46 +6,100 @@
             body {
                 background-color: black;
                 color: white;
+                font-family: 'Courier New', Courier, monospace;
             }
-            h1 {
-                margin: auto;
-                margin-top: 1em;
-                width: 100%;
-                text-align: center;
+            body * {
+                background-color: black;
+                color: white;
+                font-family: 'Courier New', Courier, monospace;
             }
-            form {
-                padding: 1em;
-                margin: auto;
-                margin-top: 1em;
-                width: 80%;
-                max-width: 25em;
+            @media screen and (min-width: 1201px) {
+                h1 {
+                    font-size: 4vw;
+                    font-weight: normal;
+                    margin: auto;
+                    margin-top: 1vw;
+                    width: 100%;
+                    text-align: center;
+                }
+                form {
+                    padding: 1vw;
+                    margin: auto;
+                    width: 80%;
+                }
+                .login-input {
+                    border: 1px solid white;
+                    border-radius: 6px;
+                    display: block;
+                    margin: auto;
+                    margin-top: 0.5vw;
+                    text-align: center;
+                    width: 25vw;
+                    height: 1.5vw;
+                    font-size: 0.8vw;
+                }
+                #submit {
+                    font-size: 1vw;
+                    font-weight: bold;
+                    margin: auto;
+                    display: block;
+                    width: 7vw;
+                    height: 3vw;
+                    border: 2px solid lightseagreen;
+                    border-radius: 6px;
+                    color: lightseagreen;
+                    background: none;
+                }
             }
-            form label {
-                display: inline-block;
-                width: 100%;
-                text-align: center;
+            @media screen and (max-width: 1200px) {
+                h1 {
+                    font-size: 12vw;
+                    font-weight: normal;
+                    margin: auto;
+                    margin-top: 1vw;
+                    width: 100%;
+                    text-align: center;
+                }
+                form {
+                    padding: 1vw;
+                    margin: auto;
+                    margin-top: 1vw;
+                    min-width: 80%;
+                }
+                .login-input {
+                    display: block;
+                    margin: auto;
+                    margin-top: 4vw;
+                    font-size: 5vw;
+                    border: 1px solid white;
+                    border-radius: 8px;
+                    text-align: center;
+                    height: 8vw;
+                    width: 80%;
+                }
+                #submit {
+                    font-size: 5vw;
+                    font-weight: bold;
+                    margin: auto;
+                    margin-top: 4vw;
+                    display: block;
+                    width: 40%;
+                    height: 12vw;
+                    border: 2px solid lightseagreen;
+                    border-radius: 8px;
+                    color: lightseagreen;
+                    background: none;
+
+                }
             }
-            .login-input {
-                display: block;
-                margin: auto;
-                text-align: center;
-                width: 25em;
-            }
-            #submit {
-                margin: auto;
-                display: block;
-                min-width: 7em;
-                min-height: 3em;
-            }
+            
         </style>
     </head>
     <body>
         <h1>MEMI Login</h1>
         <form action="/login" method="post">
-            <label for="username">Username</label><br>
-            <input type="text" id="username" name="username" class="login-input"><br>
-            <label for="password">Password</label><br>
-            <input type="password" id="password" name="password" class="login-input"><br><br>
+            <input type="text" id="username" name="username" class="login-input" placeholder="Username"><br>
+            <input type="password" id="password" name="password" class="login-input" placeholder="Password"><br><br>
             <input type="submit" value="Submit" id="submit">
           </form>
     </body>

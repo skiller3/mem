@@ -157,8 +157,10 @@ def edit_focus_target_description(*args, **kwargs):
     if name not in focus_targets:
         raise click.ClickException(f'Focus target "{name}" doesn\'t exist!  Operation aborted.')
 
-    fname = os.path.join(os.path.dirname(__file__), "memfiles", name)
-    os.system(f"code {fname}")
+    cmd = utils.get_config()["DESCRIPTION_EDITOR_OPEN_COMMAND"]
+    fname = dao.get_description_filename(name)
+
+    os.system(f"{cmd} \"{fname}\"")
 
 @mem.command()
 @click.argument("name", nargs=1, type=click.STRING)

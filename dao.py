@@ -34,15 +34,18 @@ def save_memstate(memstate):
 
 def load_description_snippet(name):
     fname = os.path.join(utils.get_config()["MEMFILES_DIR"], name)
-    with open(fname, "rt", encoding="utf-8") as filehandle:
-        snippet = filehandle.readline().strip()[:40]
+    with open(fname, "rt", encoding="utf-8") as fhandle:
+        snippet = fhandle.readline().strip()[:40]
     return snippet
+
+def get_description_filename(name):
+    return os.path.join(utils.get_config()["MEMFILES_DIR"], name)
 
 def save_description(name, description):
     fname = os.path.join(utils.get_config()["MEMFILES_DIR"], name)
-    with open(fname, "wt", encoding="utf-8") as filehandle:
-        filehandle.write(description)
-        filehandle.flush()
+    with open(fname, "wt", encoding="utf-8") as fhandle:
+        fhandle.write(description)
+        fhandle.flush()
 
 def rename_description(old_name, new_name):
     old_file = os.path.join(utils.get_config()["MEMFILES_DIR"], old_name)

@@ -1,11 +1,13 @@
 from flask import Flask, request, redirect, Response
-from flask_login import LoginManager, login_required, current_user, login_user
+from flask_login import LoginManager, login_required, current_user, login_user, logout_user
 import subprocess
 import hashlib
 import shlex
 import utils
+import dao
 import sys
 import os
+import re
 
 
 WEB_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -30,11 +32,13 @@ def _get_or_create_secret_key():
 app.secret_key = _get_or_create_secret_key()
 app.config['SECRET_KEY'] = _get_or_create_secret_key()
 login_manager = LoginManager()
+login_manager.session_protection = "strong"
 login_manager.init_app(app)
 
 
 @login_manager.user_loader
 def load_user(user_id):
+    print(f"load_user() called: {user_id}")
     users = utils.get_config()["USERS"]
     if user_id not in users:
         return None
@@ -69,9 +73,14 @@ def login():
         return redirect("/static/login.html", code=302)
 
     user = User(username, True)
-    login_user(user)
+    login_user(user, remember=True)
     
     return redirect("/static/memi.html", code=302)
+
+@app.route("/logout", methods=['POST'])
+def logout():
+    logout_user()
+    return Response(status=200)
 
 @app.route("/memlist")
 @login_required
@@ -93,6 +102,21 @@ def memcmd():
         return errtext
     return process.stdout.decode("utf-8")
 
+
+@app.route("/autocomplete", methods=['POST'])
+@login_required
+def autocomplete():
+    print("autocomplete() called")
+    command = request.json["command"]
+    command_frags = re.split(r'\s+', command)
+    if len(command_frags) < 2:
+        return command
+    prefix = command_frags[-1]
+    if not prefix:
+       return command
+    targets = [t for t in dao.load_memstate()["focus_targets"].keys()]
+    command_frags = command_frags[:-1] + [utils.autocomplete(prefix, targets)]
+    return " ".join(command_frags)
 
 class User():
     def __init__(self, username, authenticated):
