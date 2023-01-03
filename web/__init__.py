@@ -70,7 +70,7 @@ def login():
     password_hashed = hashlib.sha256(password.encode("utf-8")).hexdigest()
 
     if password_hashed != users.get(username):
-        return redirect("/static/login.html", code=302)
+        return redirect("/static/login.html", code=401)
 
     user = User(username, True)
     login_user(user, remember=True)
