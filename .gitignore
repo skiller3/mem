@@ -139,3 +139,4 @@ dmypy.json
 **/memconfig.json
 **/memfiles
 **/out
+**/start_gunicorn.sh
