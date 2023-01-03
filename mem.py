@@ -219,8 +219,8 @@ def list_important_focus_targets(*args, **kwargs):
             deferred_weekday = deferred_to.strftime("%A")[:3]
             deferred_to = deferred_to.strftime("%m/%d")
             name = f"[{deferred_weekday} {deferred_to}] {name}"
-        print(importance, ":", name, "-", snippet)
-    print(f"\n==> {len(defer_targets)} Deferred Items; {len(targets)} Total Items")
+        print(importance, ":", name, "-", snippet, end="\r\n")
+    print(f"\n==> {len(defer_targets)} Deferred Items; {len(targets)} Total Items", end="\r\n")
 
 @mem.command()
 def list_all_focus_targets(*args, **kwargs):
@@ -255,8 +255,8 @@ def list_all_focus_targets(*args, **kwargs):
             deferred_weekday = deferred_to.strftime("%A")[:3]
             deferred_to = deferred_to.strftime("%m/%d")
             name = f"[{deferred_weekday} {deferred_to}] {name}"
-        print(importance, ":", name, "-", snippet)
-    print(f"\n==> {len(defer_targets)} Deferred Items; {len(targets)} Total Items")
+        print(importance, ":", name, "-", snippet, end="\r\n")
+    print(f"\n==> {len(defer_targets)} Deferred Items; {len(targets)} Total Items", end="\r\n")
 
 @mem.command()
 @click.argument("span", nargs=1, type=click.INT)
