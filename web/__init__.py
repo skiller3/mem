@@ -64,13 +64,13 @@ def login():
     username = request.form["username"].strip()
     users = utils.get_config()["USERS"]
     if username not in users:
-        return Response("Authentication Failed!", code=401)
+        return Response("Authentication Failed!", status=401)
 
     password = request.form["password"].strip()  
     password_hashed = hashlib.sha256(password.encode("utf-8")).hexdigest()
 
     if password_hashed != users.get(username):
-        return Response("Authentication Failed!", code=401)
+        return Response("Authentication Failed!", status=401)
 
     user = User(username, True)
     login_user(user, remember=True)
@@ -78,6 +78,7 @@ def login():
     return redirect("/static/memi.html", code=302)
 
 @app.route("/logout", methods=['POST'])
+@login_required
 def logout():
     logout_user()
     return Response(status=200)
