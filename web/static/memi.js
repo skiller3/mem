@@ -29,6 +29,7 @@
             let textareaEl = document.querySelector("#input-terminal textarea");
             textareaEl.setAttribute("inputmode", "email");
             textareaEl.click();
+            window.alert("armed")
         });
     }
 
