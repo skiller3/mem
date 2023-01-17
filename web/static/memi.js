@@ -20,6 +20,8 @@
 
         loadMemlistOutput();
         setInterval(loadMemlistOutput, 2000);
+
+        setInterval(() => inputTerminal.focus(), 100);
     }
 
     function handleUserInput(key) {
