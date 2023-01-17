@@ -1,8 +1,8 @@
 (function() {
 
     let fontSize = getWidth() >= 1201 ? 16 : 32;
-    let outputTerminal = new Terminal({fontSize});
-    let inputTerminal = new Terminal({fontSize});
+    let outputTerminal = new Terminal({fontSize, convertEol: true});
+    let inputTerminal = new Terminal({fontSize, convertEol: true});
     
     let messageMode = false;
     let outputTerminalText = '';

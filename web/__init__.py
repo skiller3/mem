@@ -29,6 +29,9 @@ def _get_or_create_secret_key():
     with open(fname, "rt", encoding="utf-8") as fhandle:
         return fhandle.read()
 
+def _adjust_eols(text):
+    return text if sys.platform.startswith('win32') else text.replace("\n", "\r\n")
+
 app.secret_key = _get_or_create_secret_key()
 app.config['SECRET_KEY'] = _get_or_create_secret_key()
 login_manager = LoginManager()
@@ -88,7 +91,7 @@ def logout():
 def memlist():
     print("memlist() called")
     process = subprocess.run([MEM_CMD, 'l'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
-    return process.stdout.decode("utf-8")
+    return _adjust_eols(process.stdout.decode("utf-8"))
 
 @app.route("/memcmd", methods=['POST'])
 @login_required
@@ -100,8 +103,8 @@ def memcmd():
     process = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     errtext = process.stderr.decode("utf-8")
     if errtext:
-        return errtext
-    return process.stdout.decode("utf-8")
+        return _adjust_eols(errtext)
+    return _adjust_eols(process.stdout.decode("utf-8"))
 
 
 @app.route("/autocomplete", methods=['POST'])
