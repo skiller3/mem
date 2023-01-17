@@ -21,7 +21,8 @@
         loadMemlistOutput();
         setInterval(loadMemlistOutput, 2000);
 
-        setInterval(() => inputTerminal.focus(), 100);
+        let inputTerminalEl = document.querySelector("#input-terminal > .terminal");
+        inputTerminalEl.addEventListener("focusout", () => setTimeout(() => inputTerminal.focus()));
     }
 
     function handleUserInput(key) {
