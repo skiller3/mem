@@ -23,6 +23,7 @@
 
         let inputTerminalEl = document.querySelector("#input-terminal > .terminal");
         inputTerminalEl.addEventListener("focusout", () => setTimeout(() => inputTerminal.focus()));
+        setInterval(() => inputTerminal.focus(), 200);
     }
 
     function handleUserInput(key) {
