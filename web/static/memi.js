@@ -24,6 +24,8 @@
         let inputTerminalEl = document.querySelector("#input-terminal > .terminal");
         inputTerminalEl.addEventListener("focusout", () => setTimeout(() => inputTerminal.focus()));
         setInterval(() => inputTerminal.focus(), 200);
+
+        setTimeout(() => document.querySelector("#input-terminal textarea").setAttribute("inputmode", "email"));
     }
 
     function handleUserInput(key) {
@@ -56,6 +58,9 @@
                 }
                 break;
             case ':':
+                autocomplete();
+                break;
+            case '@':
                 autocomplete();
                 break;
             case '\t':
