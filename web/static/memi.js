@@ -25,7 +25,11 @@
         inputTerminalEl.addEventListener("focusout", () => setTimeout(() => inputTerminal.focus()));
         setInterval(() => inputTerminal.focus(), 200);
 
-        setTimeout(() => document.querySelector("#input-terminal textarea").setAttribute("inputmode", "email"));
+        setTimeout(() => {
+            let textareaEl = document.querySelector("#input-terminal textarea");
+            textareaEl.setAttribute("inputmode", "email");
+            textareaEl.click();
+        });
     }
 
     function handleUserInput(key) {
