@@ -34,9 +34,10 @@ def _adjust_eols(text):
 
 app.secret_key = _get_or_create_secret_key()
 app.config['SECRET_KEY'] = _get_or_create_secret_key()
-app.config['REMEMBER_COOKIE_SAMESITE'] = True
+app.config['REMEMBER_COOKIE_SAMESITE'] = "Strict"
+app.config['REMEMBER_COOKIE_SECURE'] = True
 login_manager = LoginManager()
-login_manager.session_protection = "strong"
+login_manager.session_protection = "basic"
 login_manager.init_app(app)
 
 
