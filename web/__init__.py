@@ -1,6 +1,5 @@
 from flask import Flask, request, redirect, Response
 import subprocess
-import hashlib
 import shlex
 import utils
 import dao
