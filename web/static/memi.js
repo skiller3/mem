@@ -142,7 +142,7 @@
     }
 
     function logout() {
-        let url = `https://accounts.google.com/Logout?&continue=${document.origin}`;
+        let url = `https://accounts.google.com/Logout?&continue=${document.location.origin}`;
         window.open(url, "_self");
     }
 
