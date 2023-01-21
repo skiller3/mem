@@ -141,9 +141,30 @@
         });
     }
 
+    function getBrowser() {
+        return /Edge\/\d+/.test(ua) ? 'ed' : /MSIE 9/.test(ua) ? 'ie9' : /MSIE 10/.test(ua) ? 'ie10' : /MSIE 11/.test(ua) ? 
+               'ie11' : /MSIE\s\d/.test(ua) ? 'ie?' : /rv\:11/.test(ua) ? 'ie11' : /Firefox\W\d/.test(ua) ? 
+               'ff' : /Chrom(e|ium)\W\d|CriOS\W\d/.test(ua) ? 'gc' : /\bSafari\W\d/.test(ua) ? 'sa' : /\bOpera\W\d/.test(ua) ?
+               'op' : /\bOPR\W\d/i.test(ua) ? 'op' : typeof MSPointerEvent !== 'undefined' ? 'ie?' : ''
+    }
+
     function logout() {
-        let url = `https://accounts.google.com/Logout?continue=${document.location.origin}`;
-        window.open(url, "_self");
+        nav = url => window.open(url, "_self");
+        browser = getBrowser();
+        if (browser === 'gc')
+            nav('https://www.google.com/_/chrome/newtab');
+        else if (['ff', 'ed', 'ie9', 'ie10', 'ie11', 'ie'].includes(browser)) {
+            nav('about:home');
+        }
+        else if (browser === 'sa'){
+            nav('http://livepage.apple.com');
+        }
+        else if (browser === 'op') {
+            nav('opera:speeddial');
+        }
+        else {
+            window.alert("Unable to handle logout for browser type '" + browser + "'");
+        }
     }
 
     function getWidth() {
