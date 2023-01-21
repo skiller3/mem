@@ -29,7 +29,6 @@
             let textareaEl = document.querySelector("#input-terminal textarea");
             textareaEl.setAttribute("inputmode", "email");
             textareaEl.click();
-            window.alert("armed")
         });
     }
 
@@ -143,12 +142,7 @@
     }
 
     function logout() {
-        axios({
-            method: 'post',
-            url: '/logout'
-        }).then(function(resp) {
-            window.open("/", "_self")
-        });
+        window.open("https://accounts.google.com/Logout", "_self");
     }
 
     function getWidth() {
