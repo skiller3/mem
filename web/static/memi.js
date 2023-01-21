@@ -142,7 +142,8 @@
     }
 
     function logout() {
-        window.open("https://accounts.google.com/Logout", "_self");
+        let url = `https://accounts.google.com/Logout?&continue=${document.origin}`;
+        window.open(url, "_self");
     }
 
     function getWidth() {
