@@ -15,17 +15,6 @@ MEM_CMD = os.path.join(BASE_DIR, f"mem.{MEM_CMD_EXT}")
 
 app = Flask(__name__)
 
-def _get_or_create_secret_key():
-    fname = os.path.join(WEB_DIR, ".secret_key")
-
-    # Create and persist a secret key if it doesn't exist
-    if not os.path.exists(fname):
-        import secrets
-        with open(fname, "wt", encoding="utf-8") as fhandle:
-              print(secrets.token_hex(), file=fhandle, end="", flush=True)
-
-    with open(fname, "rt", encoding="utf-8") as fhandle:
-        return fhandle.read()
 
 def _adjust_eols(text):
     return text if sys.platform.startswith('win32') else text.replace("\n", "\r\n")
