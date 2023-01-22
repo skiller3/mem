@@ -22,18 +22,9 @@
             body span {
                 font-size: 1em;
             }
-            @media screen and (min-width: 481px) {
-                .terminal {
-                    padding: 1em;
-                }
-            }
-            @media screen and (max-width: 480px) {
-                .terminal {
-                    padding: 2em;
-                }
-            }
             .terminal {
-                overflow: hidden;
+                 padding: 1em;
+                 overflow: hidden;
             }
             .xterm-viewport {
                 border: 1px solid white;
@@ -45,20 +36,20 @@
             #input-terminal .xterm-viewport {
                 overflow: hidden;
             }
-            @media screen and (min-width: 481px) {
+            @media screen and (min-width: 1041px) {
                 #output-terminal {
                     position: fixed;
                     left: 0.5em;
                     right: 0.5em;
                     top: 0.5em;
-                    bottom: 5em;
+                    bottom: 5.5em;
                 }
                 #output-terminal > .terminal {
                     position: fixed;
                     left: 0.5em;
                     right: 0.5em;
                     top: 0.5em;
-                    bottom: 5em;
+                    bottom: 5.5em;
                 }
                 #input-terminal {
                     position: fixed;
@@ -68,22 +59,22 @@
                     height: 1.5em;
                 }
                 #input-terminal > .terminal {
-                    height: 1.5em;
+                    height: 1.25em;
                 }
             }
-            @media screen and (max-width: 480px) {
+            @media screen and (max-width: 1040px) {
                 #output-terminal {
                     position: fixed;
                     left: 1em;
                     right: 1em;
-                    top: 8em;
+                    top: 6.5em;
                     bottom: 1em;
                 }
                 #output-terminal > .terminal {
                     position: fixed;
                     left: 1em;
                     right: 1em;
-                    top: 9em;
+                    top: 6.5em;
                     bottom: 1em;
                 }
                 #input-terminal {
@@ -94,6 +85,7 @@
                     top: 1em;
                 }
                 #input-terminal > .terminal {
+                    padding-top: 1.5em;
                     height: 2em;
                 }
             }   

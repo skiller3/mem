@@ -38,7 +38,7 @@
             editor.setShowPrintMargin(false);
             editor.setOptions({
                 maxLines: 50,
-                fontSize: "1.5vh"
+                fontSize: "2vh"
             });
 
             let focusItem = new URLSearchParams(window.location.search).get('focusitem');
@@ -46,25 +46,35 @@
 
             loadContent(editor, focusItem);
 
+            let lastKeyWasAt = false;
             document.addEventListener("keydown", function(e) {
-                if (e.key === 's' && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
-                    e.preventDefault();
-                    saveContent(editor, focusItem);
-                }
                 if (e.key === '@') {
+                    if (lastKeyWasAt) {
+                        window.close();
+                    }
+                    lastKeyWasAt = true;
                     e.preventDefault();
                     saveContent(editor, focusItem);            
                 }
+                else if (e.key === 's' && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+                    lastKeyWasAt = false;
+                    e.preventDefault();
+                    saveContent(editor, focusItem);
+                }
+                else {
+                    lastKeyWasAt = false;
+                }
             }, false);
 
-            setTimeout(() => {
+            document.querySelector("textarea").setAttribute("inputmode", "email");
+
+            snapToEditorEnd(editor);
+
+            document.body.addEventListener("click", () => {
+                console.log("click")
+                document.querySelector("textarea").focus();
                 editor.focus();
-                editor.navigateToFileEnd();
-                editor.clearSelection();
-                let row = editor.session.getLength();
-                let column = editor.session.getLine(row - 1).length;
-                editor.gotoLine(row, column);
-            })
+            });
         }
 
         function loadContent(editor, focusItem) {
@@ -78,11 +88,7 @@
                 pendingChanges = false;
                 editor.setValue(resp.data);
 
-                editor.focus();
-                editor.clearSelection();
-                let row = editor.session.getLength();
-                let column = editor.session.getLine(row - 1).length;
-                editor.gotoLine(row, column);
+                snapToEditorEnd(editor);
 
                 // Establish new undo start point
                 editor.getSession().setUndoManager(new ace.UndoManager());
@@ -122,6 +128,15 @@
             else {
                 spans.forEach(el => el.style = "");
             }
+        }
+
+        function snapToEditorEnd(editor) {
+            editor.clearSelection();
+            let row = editor.session.getLength();
+            let column = editor.session.getLine(row - 1).length;
+            editor.gotoLine(row, column);
+            document.querySelector("textarea").focus();
+            editor.focus();
         }
 
     </script>
