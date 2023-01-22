@@ -176,7 +176,7 @@
         nav = url => window.open(url, "_self");
         browser = getBrowser();
         if (browser === 'gc')
-            nav('https://www.google.com/_/chrome/newtab');
+            nav('chrome://newtab/');
         else if (['ff', 'ed', 'ie9', 'ie10', 'ie11', 'ie'].includes(browser)) {
             nav('about:home');
         }
