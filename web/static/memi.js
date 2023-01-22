@@ -16,7 +16,15 @@
         'e'
     ];
 
-    window.onload = function() {
+    function onDocumentReady(fn) {
+        if (document.readyState != 'loading'){
+            fn();
+            return;
+        }
+        document.addEventListener('DOMContentLoaded', fn);
+    }
+
+    onDocumentReady(function() {
         outputTerminal.open(document.getElementById('output-terminal'));
         // Hide cursor in output terminal
         outputTerminal.write('\033[?25l');
@@ -38,7 +46,7 @@
             textareaEl.setAttribute("inputmode", "email");
             textareaEl.click();
         });
-    }
+    });
 
     function handleUserInput(key) {
         if (messageMode) {
@@ -179,17 +187,5 @@
             window.alert("Unable to handle quit action for browser type '" + browser + "'");
         }
     }
-
-    function getWidth() {
-        if (window.innerWidth) {
-          return window.innerWidth;
-        }
-        if (document.documentElement && document.documentElement.clientWidth) {
-          return document.documentElement.clientWidth;
-        }
-        if (document.body) {
-          return document.body.clientWidth;
-        }
-      }
 
 })();

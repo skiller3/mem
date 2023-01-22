@@ -30,7 +30,15 @@
     <script>
         let pendingChanges = false;
 
-        window.onload = function() {
+        function onDocumentReady(fn) {
+            if (document.readyState != 'loading'){
+                fn();
+                return;
+            }
+            document.addEventListener('DOMContentLoaded', fn);
+        }
+
+        onDocumentReady(function() {
             ace.config.setModuleUrl("ace/theme/monokai", "/static/ace.theme-monokai.1.4.12.js");
             let editor = ace.edit("editor");
             editor.setTheme("ace/theme/monokai");
@@ -75,7 +83,7 @@
                 document.querySelector("textarea").focus();
                 editor.focus();
             });
-        }
+        });
 
         function loadContent(editor, focusItem) {
             axios({
