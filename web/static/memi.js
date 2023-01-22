@@ -1,6 +1,7 @@
 (function() {
 
-    let fontSize = getWidth() >= 1201 ? 16 : 32;
+    let fontSize = window.innerHeight * 2 / 100;  // Equivalent to 1.5vw
+
     let outputTerminal = new Terminal({fontSize, convertEol: true});
     let inputTerminal = new Terminal({fontSize, convertEol: true});
     

@@ -60,6 +60,10 @@
             setTimeout(() => {
                 editor.focus();
                 editor.navigateToFileEnd();
+                editor.clearSelection();
+                let row = editor.session.getLength();
+                let column = editor.session.getLine(row - 1).length;
+                editor.gotoLine(row, column);
             })
         }
 
@@ -73,6 +77,15 @@
             }).then(function(resp) {
                 pendingChanges = false;
                 editor.setValue(resp.data);
+
+                editor.focus();
+                editor.clearSelection();
+                let row = editor.session.getLength();
+                let column = editor.session.getLine(row - 1).length;
+                editor.gotoLine(row, column);
+
+                // Establish new undo start point
+                editor.getSession().setUndoManager(new ace.UndoManager());
 
                 // Register change listener
                 editor.on("change", function(e) {
