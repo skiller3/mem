@@ -63,7 +63,7 @@
                 command = command.trim();
                 commandFrags = command.split(/\s+/);
                 if (command.toLowerCase() === 'q' || command.toLowerCase() === 'quit') {
-                    quit();
+                    window.open(document.URL, "_self");
                 }
                 else if (commandFrags.length === 2 && editActions.includes(commandFrags[0].toLowerCase())) {
                     window.open(`/static/edit.html?focusitem=${commandFrags[1]}`, "_blank");
@@ -162,33 +162,6 @@
             inputTerminal.write("mem> ")
             inputTerminal.write(command)
         });
-    }
-
-    function getBrowser() {
-        let ua = navigator.userAgent;
-        return /Edge\/\d+/.test(ua) ? 'ed' : /MSIE 9/.test(ua) ? 'ie9' : /MSIE 10/.test(ua) ? 'ie10' : /MSIE 11/.test(ua) ? 
-               'ie11' : /MSIE\s\d/.test(ua) ? 'ie?' : /rv\:11/.test(ua) ? 'ie11' : /Firefox\W\d/.test(ua) ? 
-               'ff' : /Chrom(e|ium)\W\d|CriOS\W\d/.test(ua) ? 'gc' : /\bSafari\W\d/.test(ua) ? 'sa' : /\bOpera\W\d/.test(ua) ?
-               'op' : /\bOPR\W\d/i.test(ua) ? 'op' : typeof MSPointerEvent !== 'undefined' ? 'ie?' : ''
-    }
-
-    function quit() {
-        nav = url => window.open(url, "_self");
-        browser = getBrowser();
-        if (browser === 'gc')
-            nav('chrome://newtab/');
-        else if (['ff', 'ed', 'ie9', 'ie10', 'ie11', 'ie'].includes(browser)) {
-            nav('about:home');
-        }
-        else if (browser === 'sa'){
-            nav('http://livepage.apple.com');
-        }
-        else if (browser === 'op') {
-            nav('opera:speeddial');
-        }
-        else {
-            window.alert("Unable to handle quit action for browser type '" + browser + "'");
-        }
     }
 
 })();
