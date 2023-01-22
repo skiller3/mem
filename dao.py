@@ -38,6 +38,12 @@ def load_description_snippet(name):
         snippet = fhandle.readline().strip()[:40]
     return snippet
 
+def load_description(name):
+    fname = os.path.join(utils.get_config()["MEMFILES_DIR"], name)
+    with open(fname, "rt", encoding="utf-8") as fhandle:
+        snippet = fhandle.read()
+    return snippet
+
 def get_description_filename(name):
     return os.path.join(utils.get_config()["MEMFILES_DIR"], name)
 

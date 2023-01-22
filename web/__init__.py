@@ -53,3 +53,15 @@ def autocomplete():
     targets = [t for t in dao.load_memstate()["focus_targets"].keys()]
     command_frags = command_frags[:-1] + [utils.autocomplete(prefix, targets)]
     return " ".join(command_frags)
+
+@app.route("/description", methods=['GET'])
+def load_description():
+    focus_item = request.args.get("focusitem")
+    return dao.load_description(focus_item)
+
+@app.route("/description", methods=['POST'])
+def save_description():
+    focus_item = request.json["focusitem"]
+    text = request.json["text"]
+    dao.save_description(focus_item, text)
+    return Response(status=200)

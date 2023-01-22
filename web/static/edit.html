@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>MEMI Editor</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <style type="text/css" media="screen">
+        #editor {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="editor"></div>
+    <script src="/static/ace.min.1.14.0.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/static/axios.min.js"></script>
+    <script>
+        let pendingChanges = false;
+
+        window.onload = function() {
+            ace.config.setModuleUrl("ace/theme/monokai", "/static/ace.theme-monokai.1.4.12.js");
+            let editor = ace.edit("editor");
+            editor.setTheme("ace/theme/monokai");
+            editor.session.setMode("ace/mode/text");
+            editor.setShowPrintMargin(false);
+
+            let focusItem = new URLSearchParams(window.location.search).get('focusitem');
+            document.title = focusItem;
+
+            loadContent(editor, focusItem);
+
+            document.addEventListener("keydown", function(e) {
+                if (e.key === 's' && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+                    e.preventDefault();
+                    saveContent(editor, focusItem);
+                }
+                if (e.key === '@') {
+                    e.preventDefault();
+                    saveContent(editor, focusItem);            
+                }
+            }, false);
+
+            setTimeout(() => {
+                editor.focus();
+                editor.navigateToFileEnd();
+            })
+        }
+
+        function loadContent(editor, focusItem) {
+            axios({
+                method: 'get',
+                url: '/description',
+                params: {
+                    focusitem: focusItem
+                }
+            }).then(function(resp) {
+                pendingChanges = false;
+                editor.setValue(resp.data);
+
+                // Register change listener
+                editor.on("change", function(e) {
+                    pendingChanges = true;
+                    applyPendingChangeStyle();
+                    setTimeout(applyPendingChangeStyle, 5);
+                });
+            });
+        }
+
+        function saveContent(editor, focusItem) {
+            if (!pendingChanges) {
+                return;
+            }
+            axios({
+                method: 'post',
+                url: '/description',
+                data: {
+                    focusitem: focusItem,
+                    text: editor.getValue()
+                }
+            }).then(function(resp) {
+                pendingChanges = false;
+                applyPendingChangeStyle()
+                setTimeout(applyPendingChangeStyle, 5);
+            });
+        }
+
+        function applyPendingChangeStyle() {
+            let spans = document.querySelectorAll(".ace_line span");
+            if (pendingChanges) {
+                spans.forEach(el => el.style = "font-style: italic;");
+            }
+            else {
+                spans.forEach(el => el.style = "");
+            }
+        }
+
+    </script>
+</body>
+
+</html>

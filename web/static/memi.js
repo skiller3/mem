@@ -8,6 +8,13 @@
     let outputTerminalText = '';
     let command = '';
 
+    let editActions = [
+        'edit-focus-target-description',
+        'edit',
+        'ed',
+        'e'
+    ];
+
     window.onload = function() {
         outputTerminal.open(document.getElementById('output-terminal'));
         // Hide cursor in output terminal
@@ -42,8 +49,12 @@
         switch (key) {
             case '\r':  // Enter
                 command = command.trim();
+                commandFrags = command.split(/\s+/);
                 if (command.toLowerCase() === 'q' || command.toLowerCase() === 'quit') {
-                    logout();
+                    quit();
+                }
+                else if (commandFrags.length === 2 && editActions.includes(commandFrags[0].toLowerCase())) {
+                    window.open(`/static/edit.html?focusitem=${commandFrags[1]}`, "_blank");
                 }
                 else if (command !== '') {
                     runMemcmd();
@@ -149,7 +160,7 @@
                'op' : /\bOPR\W\d/i.test(ua) ? 'op' : typeof MSPointerEvent !== 'undefined' ? 'ie?' : ''
     }
 
-    function logout() {
+    function quit() {
         nav = url => window.open(url, "_self");
         browser = getBrowser();
         if (browser === 'gc')
@@ -164,7 +175,7 @@
             nav('opera:speeddial');
         }
         else {
-            window.alert("Unable to handle logout for browser type '" + browser + "'");
+            window.alert("Unable to handle quit action for browser type '" + browser + "'");
         }
     }
 
