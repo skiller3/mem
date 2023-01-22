@@ -5,12 +5,20 @@
     <title>MEMI Editor</title>
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
     <style type="text/css" media="screen">
-        #editor {
+        body {
+            background-color: black;
             position: absolute;
             top: 0;
+            left: 0;
             right: 0;
             bottom: 0;
+        }
+        #editor {
+            position: relative;
+            top: 0;
             left: 0;
+            right: 0;
+            bottom: 0;
         }
     </style>
 </head>
@@ -28,6 +36,10 @@
             editor.setTheme("ace/theme/monokai");
             editor.session.setMode("ace/mode/text");
             editor.setShowPrintMargin(false);
+            editor.setOptions({
+                maxLines: 50,
+                fontSize: "1.5vh"
+            });
 
             let focusItem = new URLSearchParams(window.location.search).get('focusitem');
             document.title = focusItem;
