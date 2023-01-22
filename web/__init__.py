@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, Response
+from flask import Flask, request, redirect, Response, send_file
 import subprocess
 import shlex
 import utils
@@ -22,6 +22,14 @@ def _adjust_eols(text):
 @app.route("/")
 def redirect_from_root():
     return redirect("/static/memi.html", code=302)
+
+@app.route("/static/edit.html")
+def redirect_from_edit_send():
+    focus_item = request.args.get("focusitem")
+    if focus_item not in dao.load_memstate()["focus_targets"]:
+        return redirect("/static/memi.html", code=302)
+    return send_file(os.path.join(WEB_DIR, "static", "edit.html"), download_name="edit/html",
+                     mimetype="text/html")
 
 @app.route("/memlist")
 def memlist():

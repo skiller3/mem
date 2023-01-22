@@ -92,7 +92,8 @@
                 params: {
                     focusitem: focusItem
                 }
-            }).then(function(resp) {
+            }).catch(window.close)
+            .then(function(resp) {
                 pendingChanges = false;
                 editor.setValue(resp.data);
 

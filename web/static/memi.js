@@ -1,9 +1,7 @@
 (function() {
 
-    let fontSize = window.innerHeight * 2 / 100;  // Equivalent to 1.5vw
-
-    let outputTerminal = new Terminal({fontSize, convertEol: true});
-    let inputTerminal = new Terminal({fontSize, convertEol: true});
+    let outputTerminal = null;
+    let inputTerminal = null;
     
     let messageMode = false;
     let outputTerminalText = '';
@@ -25,6 +23,11 @@
     }
 
     onDocumentReady(function() {
+        let fontSize = window.innerHeight * 2 / 100;  // Equivalent to 1.5vw
+
+        outputTerminal = new Terminal({fontSize, convertEol: true});
+        inputTerminal = new Terminal({fontSize, convertEol: true});
+
         outputTerminal.open(document.getElementById('output-terminal'));
         // Hide cursor in output terminal
         outputTerminal.write('\033[?25l');
